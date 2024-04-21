@@ -2,8 +2,9 @@ noinst_PROGRAMS =	table-postgres
 
 table_postgres_SOURCES =	table_postgres.c dict.c log.c table_stdio.c util.c
 
-AM_CFLAGS =
 LDADD =			$(LIBOBJS)
+
+dist_man5_MANS =	table-postgres.5
 
 smtpdir =		${prefix}/libexec/smtpd
 
