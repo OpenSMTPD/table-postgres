@@ -16,8 +16,8 @@ smtpd.conf(5).
 
 # POSTGRESQL TABLE
 
-A postgresql table allows the storing of usernames, passwords, aliases, and domains
-in a format that is shareable across various machines that support
+A postgresql table allows the storing of usernames, passwords, aliases, and
+domains in a format that is shareable across various machines that support
 postgres(1).
 
 The table is used by
@@ -33,7 +33,8 @@ databases with one or more tables.
 If the table is used for authentication, the password should be
 encrypted using the
 crypt(3)
-function. Such passwords can be generated using the
+function.
+Such passwords can be generated using the
 encrypt(1)
 utility or
 smtpctl(8)
@@ -52,48 +53,55 @@ The following configuration options are available:
 > Connection info needed to connect to the PostgreSQL database.
 > For example:
 
-> **conninfo**
-> **host**=*'db.example.com'*
-> **user**=*'maildba'*
-> **password**=*'OpenSMTPDRules!'*
-> **dbname**=*'opensmtpdb'*
+> > conninfo host='db.example.com' user='maildba' password='...' dbname='opensmtpdb'
 
 **query\_alias**
 *SQL statement*
 
-> This is used to provide a query to look up aliases. The question mark
-> is replaced with the appropriate data. For alias it is the left hand side of
-> the SMTP address. This expects one VARCHAR to be returned with the user name
-> the alias resolves to.
+> This is used to provide a query to look up aliases.
+> The question mark is replaced with the appropriate data.
+> For alias it is the left hand side of the SMTP address.
+> This expects one VARCHAR to be returned with the user name the alias
+> resolves to.
 
 **query\_credentials**
 *SQL statement*
 
-> This is used to provide a query for looking up user credentials. The question
-> mark is replaced with the appropriate data. For credentials it is the left
-> hand side of the SMTP address. The query expects that there are two VARCHARS
-> returned, one with a user name and one with a password in
+> This is used to provide a query for looking up user credentials.
+> The question mark is replaced with the appropriate data.
+> For credentials it is the left hand side of the SMTP address.
+> The query expects that there are two VARCHARS returned, one with a user
+> name and one with a password in
 > crypt(3)
 > format.
 
 **query\_domain**
 *SQL statement*
 
-> This is used to provide a query for looking up a domain. The question mark
-> is replaced with the appropriate data. For the domain it would be the
-> right hand side of the SMTP address. This expects one VARCHAR to be returned
-> with a matching domain name.
+> This is used to provide a query for looking up a domain.
+> The question mark is replaced with the appropriate data.
+> For the domain it would be the right hand side of the SMTP address.
+> This expects one VARCHAR to be returned with a matching domain name.
 
 **query\_mailaddrmap**
 *SQL statement*
 
-> This is used to provide a query to look up senders. The question mark
-> is replaced with the appropriate data. This expects one VARCHAR to be
-> returned with the address the sender is allowed to send mails from.
+> This is used to provide a query to look up senders.
+> The question mark is replaced with the appropriate data.
+> This expects one VARCHAR to be returned with the address the sender
+> is allowed to send mails from.
 
 A generic SQL statement would be something like:
 
 	query_ SELECT value FROM table WHERE key=$1;
+
+# FILES
+
+*/etc/mail/postgres.conf*
+
+> Default
+> table-postgresql(5)
+> configuration file.
 
 # EXAMPLES
 
@@ -104,14 +112,15 @@ The filtering part is excluded in this example.
 
 The configuration below is for a medium-size mail server which handles
 multiple domains with multiple virtual users and is based on several
-assumptions. One is that a single system user named vmail is used for all
-virtual users. This user needs to be created:
+assumptions.
+One is that a single system user named vmail is used for all virtual users.
+This user needs to be created:
 
 	# useradd -g =uid -c "Virtual Mail" -d /var/vmail -s /sbin/nologin vmail
 	# mkdir /var/vmail
 	# chown vmail:vmail /var/vmail
 
-*PostgreSQL schema*
+PostgreSQL schema:
 
 	CREATE TABLE domains (
 	  id SERIAL,
@@ -127,6 +136,9 @@ virtual users. This user needs to be created:
 	    email VARCHAR(255) NOT NULL DEFAULT '',
 	    password VARCHAR(255) NOT NULL DEFAULT ''
 	);
+
+That can be populated as follows:
+
 	INSERT INTO domains VALUES (1, "example.com");
 	INSERT INTO domains VALUES (2, "example.net");
 	INSERT INTO domains VALUES (3, "example.org");
@@ -163,20 +175,12 @@ virtual users. This user needs to be created:
 
 */etc/mail/postgres.conf*
 
-	conninfo host='db.example.com' user='postfix' password='PostfixOutOpenSMTPDin' dbname='postfix'
+	conninfo host='db.example.com' user='postfix' password='...' dbname='postfix'
 	query_alias SELECT destination FROM alias WHERE email=$1;
 	query_credentials SELECT username, password FROM mailbox WHERE username=$1;
 	query_domain SELECT domain FROM domain WHERE domain=$1;
 
 The rest of the config remains the same.
-
-# FILES
-
-*/etc/mail/postgres.conf*
-
-> Default
-> table-postgresql(8)
-> configuration file.
 
 # TODO
 
@@ -190,10 +194,10 @@ Documenting the following query options:
 
 # SEE ALSO
 
+encrypt(1),
+crypt(3),
 smtpd.conf(5),
 smtpctl(8),
-smtpd(8),
-encrypt(1),
-crypt(3)
+smtpd(8)
 
 Nixpkgs - September 30, 2016
