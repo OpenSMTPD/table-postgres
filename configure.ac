@@ -16,7 +16,7 @@ AC_REPLACE_FUNCS([ \
 ])
 
 AC_SEARCH_LIBS([PQconnectdbParams], [pq], [], [
-	AC_MSG_ERROR([requires sqlite3])
+	AC_MSG_ERROR([requires libpq])
 ])
 
 CFLAGS="$CFLAGS -I$srcdir/openbsd-compat"
