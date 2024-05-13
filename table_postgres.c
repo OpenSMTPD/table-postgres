@@ -311,9 +311,14 @@ table_postgres_query(const char *key, int service)
 	PGresult	*res;
 	const char	*errfld;
 	char		*stmt;
-	int		 i;
+	int		 i, retry_times = 2;
 
 retry:
+	retry_times--;
+	if (retry_times < 0) {
+		log_warnx("warn: table-postgres: to many retries");
+		return NULL;
+	}
 	stmt = NULL;
 	for (i = 0; i < SQL_MAX; i++) {
 		if (service == 1 << i) {
@@ -444,12 +449,17 @@ table_postgres_fetch(int service, struct dict *params, char *dst, size_t sz)
 	char		*stmt;
 	PGresult	*res;
 	const char	*k, *errfld;
-	int		 i;
+	int		 i, retry_times = 1;
 
 	if (config->db == NULL && config_connect(config) == 0)
 		return -1;
 
 retry:
+	retry_times--;
+	if (retry_times < 0) {
+		log_warnx("warn: table-postgres: to many retries");
+		return -1;
+	}
 	if (service != K_SOURCE)
 		return -1;
 
