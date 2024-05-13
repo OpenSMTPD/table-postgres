@@ -458,7 +458,7 @@ retry:
 
 	if (config->source_ncall < config->source_refresh &&
 	    time(NULL) - config->source_update < config->source_expire)
-	    goto fetch;
+		goto fetch;
 
 	res = PQexecPrepared(config->db, stmt, 0, NULL, NULL, NULL, 0);
 	if (PQresultStatus(res) != PGRES_TUPLES_OK) {
