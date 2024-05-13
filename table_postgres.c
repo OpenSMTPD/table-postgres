@@ -311,14 +311,9 @@ table_postgres_query(const char *key, int service)
 	PGresult	*res;
 	const char	*errfld;
 	char		*stmt;
-	int		 i, retry_times = 2;
+	int		 i, retries = 1;
 
 retry:
-	retry_times--;
-	if (retry_times < 0) {
-		log_warnx("warn: table-postgres: to many retries");
-		return NULL;
-	}
 	stmt = NULL;
 	for (i = 0; i < SQL_MAX; i++) {
 		if (service == 1 << i) {
@@ -339,8 +334,10 @@ retry:
 			log_warnx("warn: table-postgres: trying to reconnect after error: %s",
 			    PQerrorMessage(config->db));
 			PQclear(res);
-			if (config_connect(config))
+			if (config_connect(config) && --retries > 0)
 				goto retry;
+			if (retries <= 0)
+				log_warnx("warn: table-postgres: too many retries");
 			return NULL;
 		}
 		log_warnx("warn: PQexecPrepared: %s", PQerrorMessage(config->db));
@@ -449,17 +446,12 @@ table_postgres_fetch(int service, struct dict *params, char *dst, size_t sz)
 	char		*stmt;
 	PGresult	*res;
 	const char	*k, *errfld;
-	int		 i, retry_times = 1;
+	int		 i, retries = 1;
 
 	if (config->db == NULL && config_connect(config) == 0)
 		return -1;
 
 retry:
-	retry_times--;
-	if (retry_times < 0) {
-		log_warnx("warn: table-postgres: to many retries");
-		return -1;
-	}
 	if (service != K_SOURCE)
 		return -1;
 
@@ -481,8 +473,10 @@ retry:
 		if (errfld == NULL || (errfld[0] == '0' && errfld[1] == '8')) {
 			log_warnx("warn: trying to reconnect after error: %s", PQerrorMessage(config->db));
 			PQclear(res);
-			if (config_connect(config))
+			if (config_connect(config) && --retries > 0)
 				goto retry;
+			if (retries <= 0)
+				log_warnx("warn: table-postgres: too many retries");
 			return -1;
 		}
 		log_warnx("warn: PQexecPrepared: %s", PQerrorMessage(config->db));
