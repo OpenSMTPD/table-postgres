@@ -334,7 +334,7 @@ retry:
 			log_warnx("warn: table-postgres: trying to reconnect after error: %s",
 			    PQerrorMessage(config->db));
 			PQclear(res);
-			if (config_connect(config) && --retries > 0)
+			if (config_connect(config) && retries-- > 0)
 				goto retry;
 			if (retries <= 0)
 				log_warnx("warn: table-postgres: too many retries");
@@ -473,7 +473,7 @@ retry:
 		if (errfld == NULL || (errfld[0] == '0' && errfld[1] == '8')) {
 			log_warnx("warn: trying to reconnect after error: %s", PQerrorMessage(config->db));
 			PQclear(res);
-			if (config_connect(config) && --retries > 0)
+			if (config_connect(config) && retries-- > 0)
 				goto retry;
 			if (retries <= 0)
 				log_warnx("warn: table-postgres: too many retries");
