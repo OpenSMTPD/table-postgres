@@ -1,4 +1,4 @@
-AC_INIT([table-postgres], [1.1], [bugs@opensmtpd.org])
+AC_INIT([table-postgres], [1.1.1], [bugs@opensmtpd.org])
 AC_CONFIG_AUX_DIR(etc)
 AM_INIT_AUTOMAKE([-Wall foreign subdir-objects])
 AC_CONFIG_LIBOBJ_DIR(openbsd-compat)
