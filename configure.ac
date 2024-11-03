@@ -28,5 +28,6 @@ AC_CHECK_HEADER([sys/tree.h], [], [
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_FILES([
 	Makefile
+	openbsd-compat/Makefile
 ])
 AC_OUTPUT

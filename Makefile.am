@@ -1,3 +1,5 @@
+SUBDIRS =		openbsd-compat
+
 noinst_PROGRAMS =	table-postgres
 
 table_postgres_SOURCES =	table_postgres.c dict.c log.c table_stdio.c util.c
